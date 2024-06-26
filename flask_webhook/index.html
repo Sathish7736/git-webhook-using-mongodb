@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Events</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .event {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Latest GitHub Events</h1>
+    <div id="events"></div>
+
+    <script>
+        function fetchEvents() {
+            fetch('/events')
+                .then(response => response.json())
+                .then(data => {
+                    const eventsDiv = document.getElementById('events');
+                    eventsDiv.innerHTML = '';
+                    data.forEach(event => {
+                        const eventDiv = document.createElement('div');
+                        eventDiv.className = 'event';
+                        const timestamp = new Date(event.timestamp).toUTCString();
+                        if (event.action === 'PUSH') {
+                            eventDiv.innerText = `${event.author} pushed to ${event.to_branch} on ${timestamp}`;
+                        } else if (event.action === 'PULL REQUEST') {
+                            eventDiv.innerText = `${event.author} submitted a pull request from ${event.from_branch} to ${event.to_branch} on ${timestamp}`;
+                        } else if (event.action === 'MERGE') {
+                            eventDiv.innerText = `${event.author} merged branch ${event.from_branch} to ${event.to_branch} on ${timestamp}`;
+                        }
+                        eventsDiv.appendChild(eventDiv);
+                    });
+                });
+        }
+
+        setInterval(fetchEvents, 15000);
+        fetchEvents();
+    </script>
+</body>
+</html>
